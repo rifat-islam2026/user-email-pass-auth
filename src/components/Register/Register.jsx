@@ -12,6 +12,7 @@ function Register() {
         e.preventDefault()
         const email = e.target.email.value;
         const password = e.target.password.value;
+        const accepted = e.target.terms.checked;
         console.log(email, password)
         
         // reset error 
@@ -25,7 +26,11 @@ function Register() {
         else if (!/[A-Z]/.test(password)) {
             setRegisterError('Your password should have at last or one upper case characters.')
             return;
-}
+        }
+        else if (!accepted) {
+            setRegisterError('Please accept your terms and condition')
+            return;
+        }
         // create user 
         createUserWithEmailAndPassword(auth, email, password)
             .then(result => {
@@ -65,29 +70,31 @@ function Register() {
                               required /> 
                           <span
                               onClick={()=>setShowPass(!showPass)}
-                              className="absolute left-[213px] top-[52px]">
+                              className="absolute left-[280px] top-[52px]">
                               {
                                   showPass ? <FaEye /> : <FaEyeSlash/>
                               }
                           </span>
                           
-                          {/* <input type="checkbox" name="trams" className="py-5" /> */}
+                          <div className="flex item-center gap-3 py-3">
+                              <input type="checkbox" name="terms" />
+                              <label htmlFor="terms">Please accept your terms and condition</label>
+                          </div>
                           <label className="label">
                               <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
                           </label>
                       </div>
                       <div className="form-control mt-6">
-                          <button className="btn btn-primary">Login</button>
+                          <button type="submit" className="btn btn-primary">Submit</button>
                       </div>
+
+                      {
+                          registerError && <p className="text-red-600 p-3">{registerError}</p>
+                      }
+                      {
+                          success && <p className="text-green-600 p-3">{success}</p>
+                      }
                   </form>
-
-                  {
-                      registerError && <p className="text-red-600 p-3">{registerError}</p>
-                  }
-                  {
-                      success && <p className="text-green-600 p-3">{success}</p>
-                  }
-
               </div>
           </div>
       </div>
