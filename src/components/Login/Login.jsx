@@ -1,5 +1,5 @@
 
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import auth from "../../firebase/firebase-config";
@@ -16,6 +16,7 @@ function Login() {
         const email = e.target.email.value;
         const password = e.target.password.value;
         console.log(email, password)
+
         // reset error 
         setLoginError('');
         setSuccess('')
@@ -23,7 +24,12 @@ function Login() {
         signInWithEmailAndPassword(auth, email, password)
             .then(result => {
                 console.log(result.user)
-                setSuccess('User Login successfully')
+                if (result.user.emailVerified) {
+                    setSuccess('User Login successfully')
+                }
+                else {
+                    alert('Please check your email and verify.')
+                }
             })
             .catch(error => {
                 console.log(error.message)
@@ -32,7 +38,22 @@ function Login() {
     }
     const handelForgetPass = () => {
         const email = emailRef.current.value;
-        console.log(email)
+        if (!email) {
+            alert('Please provided a email!')
+            return;
+        }
+        else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+            alert('Please write a valid email address!')
+            return;
+        }
+        sendPasswordResetEmail(auth, email)
+            .then(() => {
+                alert('Please checked your email.')
+            })
+            .catch((error) => {
+                setLoginError(error.message)
+            });
+
     }
 
 

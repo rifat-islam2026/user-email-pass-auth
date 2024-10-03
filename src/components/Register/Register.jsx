@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "firebase/auth";
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -11,6 +11,7 @@ function Register() {
     
     const handelRegister=(e) => {
         e.preventDefault()
+        const name = e.target.name.value;
         const email = e.target.email.value;
         const password = e.target.password.value;
         const accepted = e.target.terms.checked;
@@ -38,6 +39,16 @@ function Register() {
                 const loggedUser = result.user;
                 setSuccess('Register Successfully')
                 console.log(loggedUser)
+                // update profile 
+                updateProfile(result.user, {
+                    displayName: name
+                })
+                // send verify email 
+                sendEmailVerification(result.user)
+                    .then(() => {
+                        alert('Please check your email and verify your account!')
+                    });
+
             })
             .catch(error => {
             setRegisterError(error.message)
@@ -53,6 +64,12 @@ function Register() {
               </div>
               <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
                   <form onSubmit={handelRegister} className="card-body">
+                      <div className="form-control">
+                          <label className="label">
+                              <span className="label-text">Name</span>
+                          </label>
+                          <input type="name" placeholder="name" name="name" className="input input-bordered" required />
+                      </div>
                       <div className="form-control">
                           <label className="label">
                               <span className="label-text">Email</span>
