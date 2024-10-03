@@ -1,21 +1,40 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import auth from "../../firebase/firebase-config";
 
 function Register() {
-
+    const [registerError,setRegisterError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [showPass,setShowPass] = useState(false);
+    
     const handelRegister=(e) => {
         e.preventDefault()
         const email = e.target.email.value;
         const password = e.target.password.value;
         console.log(email, password)
         
+        // reset error 
+        setRegisterError('');
+        setSuccess('')
+
+        if (password.length < 6) {
+            setRegisterError('Password should be at least 6 characters or longer!')
+            return;
+        }
+        else if (!/[A-Z]/.test(password)) {
+            setRegisterError('Your password should have at last or one upper case characters.')
+            return;
+}
+        // create user 
         createUserWithEmailAndPassword(auth, email, password)
             .then(result => {
                 const loggedUser = result.user;
+                setSuccess('Register Successfully')
                 console.log(loggedUser)
             })
             .catch(error => {
-            console.log(error.message)
+            setRegisterError(error.message)
         })
 
     }
@@ -34,11 +53,24 @@ function Register() {
                           </label>
                           <input type="email" placeholder="email" name="email" className="input input-bordered" required />
                       </div>
-                      <div className="form-control">
+                      <div className="form-control relative">
                           <label className="label">
                               <span className="label-text">Password</span>
                           </label>
-                          <input type="password" placeholder="password" name="password" className="input input-bordered" required />
+                          <input
+                              type={showPass ? "text" : "password"}
+                              placeholder="password"
+                              name="password"
+                              className="input input-bordered "
+                              required /> 
+                          <span
+                              onClick={()=>setShowPass(!showPass)}
+                              className="absolute left-[213px] top-[52px]">
+                              {
+                                  showPass ? <FaEye /> : <FaEyeSlash/>
+                              }
+                          </span>
+                          
                           {/* <input type="checkbox" name="trams" className="py-5" /> */}
                           <label className="label">
                               <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
@@ -48,6 +80,14 @@ function Register() {
                           <button className="btn btn-primary">Login</button>
                       </div>
                   </form>
+
+                  {
+                      registerError && <p className="text-red-600 p-3">{registerError}</p>
+                  }
+                  {
+                      success && <p className="text-green-600 p-3">{success}</p>
+                  }
+
               </div>
           </div>
       </div>
